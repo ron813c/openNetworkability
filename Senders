@@ -1,0 +1,903 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Authentication
+
+
+
+
+
+
+
+
+
+my_org="octo-org"
+
+my_num=5
+
+gh api graphql -f query='
+
+  query($organization: String! $number: Int!){
+
+    organization(login: $organization){
+
+      projectV2(number: $number) {
+
+        id
+
+      }
+
+    }
+
+  }' -f organization=$my_org -F number=$my_num
+
+
+
+
+
+
+
+
+
+
+
+
+
+gh api graphql -f query='
+
+  query{
+
+    organization(login: "ORGANIZATION"){
+
+      projectV2(number: NUMBER) {
+
+        id
+
+      }
+
+    }
+
+  }'
+
+
+
+gh api graphql -f query='
+
+  query{
+
+    organization(login: "ORGANIZATION") {
+
+      projectsV2(first: 20) {
+
+        nodes {
+
+          id
+
+          title
+
+        }
+
+      }
+
+    }
+
+  }'
+
+
+
+
+
+
+
+gh api graphql -f query='
+
+  query{
+
+    user(login: "USER"){
+
+      projectV2(number: NUMBER) {
+
+        id
+
+      }
+
+    }
+
+  }'
+
+
+
+gh api graphql -f query='
+
+  query{
+
+    user(login: "USER") {
+
+      projectsV2(first: 20) {
+
+        nodes {
+
+          id
+
+          title
+
+        }
+
+      }
+
+    }
+
+  }'
+
+
+
+
+
+
+
+gh api graphql -f query='
+
+  query{
+
+  node(id: "PROJECT_ID") {
+
+    ... on ProjectV2 {
+
+      fields(first: 20) {
+
+        nodes {
+
+          ... on ProjectV2Field {
+
+            id
+
+            name
+
+          }
+
+          ... on ProjectV2IterationField {
+
+            id
+
+            name
+
+            configuration {
+
+              iterations {
+
+                startDate
+
+                id
+
+              }
+
+            }
+
+          }
+
+          ... on ProjectV2SingleSelectField {
+
+            id
+
+            name
+
+            options {
+
+              id
+
+              name
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+}'
+
+The response will look similar to the following example:
+
+{
+
+  "data": {
+
+    "node": {
+
+      "fields": {
+
+        "nodes": [
+
+          {
+
+            "id": "PVTF_lADOANN5s84ACbL0zgBZrZY",
+
+            "name": "Title"
+
+          },
+
+          {
+
+            "id": "PVTF_lADOANN5s84ACbL0zgBZrZc",
+
+            "name": "Assignees"
+
+          },
+
+          {
+
+            "id": "PVTSSF_lADOANN5s84ACbL0zgBZrZg",
+
+            "name": "Status",
+
+            "options": [
+
+              {
+
+                "id": "f75ad846",
+
+                "name": "Todo"
+
+              },
+
+              {
+
+                "id": "47fc9ee4",
+
+                "name": "In Progress"
+
+              },
+
+              {
+
+                "id": "98236657",
+
+                "name": "Done"
+
+              }
+
+            ]
+
+          },
+
+          {
+
+            "id": "PVTIF_lADOANN5s84ACbL0zgBah28",
+
+            "name": "Iteration",
+
+            "configuration": {
+
+              "iterations": [
+
+                {
+
+                  "startDate": "2022-05-29",
+
+                  "id": "cfc16e4d"
+
+                }
+
+              ]
+
+            }
+
+          }
+
+        ]
+
+      }
+
+    }
+
+  }
+
+}
+
+
+
+
+
+gh api graphql -f query='
+
+  query{
+
+  node(id: "PROJECT_ID") {
+
+    ... on ProjectV2 {
+
+      fields(first: 20) {
+
+        nodes {
+
+          ... on ProjectV2FieldCommon {
+
+            id
+
+            name
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+}
+
+
+
+{
+
+  "data": {
+
+    "node": {
+
+      "fields": {
+
+        "nodes": [
+
+          {
+
+            "__typename": "ProjectV2Field",
+
+            "id": "PVTF_lADOANN5s84ACbL0zgBZrZY",
+
+            "name": "Title"
+
+          },
+
+          {
+
+            "__typename": "ProjectV2Field",
+
+            "id": "PVTF_lADOANN5s84ACbL0zgBZrZc",
+
+            "name": "Assignees"
+
+          },
+
+          {
+
+            "__typename": "ProjectV2SingleSelectField",
+
+            "id": "PVTSSF_lADOANN5s84ACbL0zgBZrZg",
+
+            "name": "Status"
+
+          },
+
+          {
+
+            "__typename": "ProjectV2IterationField",
+
+            "id": "PVTIF_lADOANN5s84ACbL0zgBah28",
+
+            "name": "Iteration"
+
+          }
+
+        ]
+
+      }
+
+    }
+
+  }
+
+}
+
+
+
+
+
+
+
+gh api graphql -f query='
+
+  query{
+
+    node(id: "PROJECT_ID") {
+
+        ... on ProjectV2 {
+
+          items(first: 20) {
+
+            nodes{
+
+              id
+
+              fieldValues(first: 8) {
+
+                nodes{                
+
+                  ... on ProjectV2ItemFieldTextValue {
+
+                    text
+
+                    field {
+
+                      ... on ProjectV2FieldCommon {
+
+                        name
+
+                      }
+
+                    }
+
+                  }
+
+                  ... on ProjectV2ItemFieldDateValue {
+
+                    date
+
+                    field {
+
+                      ... on ProjectV2FieldCommon {
+
+                        name
+
+                      }
+
+                    }
+
+                  }
+
+                  ... on ProjectV2ItemFieldSingleSelectValue {
+
+                    name
+
+                    field {
+
+                      ... on ProjectV2FieldCommon {
+
+                        name
+
+                      }
+
+                    }
+
+                  }
+
+                }              
+
+              }
+
+              content{              
+
+                ... on DraftIssue {
+
+                  title
+
+                  body
+
+                }
+
+                ...on Issue {
+
+                  title
+
+                  assignees(first: 10) {
+
+                    nodes{
+
+                      login
+
+                    }
+
+                  }
+
+                }
+
+                ...on PullRequest {
+
+                  title
+
+                  assignees(first: 10) {
+
+                    nodes{
+
+                      login
+
+                    }
+
+                  }
+
+                }
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }'
+
+
+
+
+
+
+
+
+
+
+
+
+
+gh api graphql -f query='
+
+  mutation {
+
+    addProjectV2ItemById(input: {projectId: "PROJECT_ID" contentId: "CONTENT_ID"}) {
+
+      item {
+
+        id
+
+      }
+
+    }
+
+  }'
+
+The response will contain the node ID of the newly created item.
+
+{
+
+  "data": {
+
+    "addProjectV2ItemById": {
+
+      "item": {
+
+        "id": "PVTI_lADOANN5s84ACbL0zgBVd94"
+
+      }
+
+    }
+
+  }
+
+}
+
+
+
+
+
+
+
+gh api graphql -f query='
+
+  mutation {
+
+    addProjectV2DraftIssue(input: {projectId: "PROJECT_ID" title: "TITLE" body: "BODY"}) {
+
+      item {
+
+        id
+
+      }
+
+    }
+
+  }'
+
+The response will contain the node ID of the newly created draft issue.
+
+{
+
+  "data": {
+
+    "addProjectV2ItemById": {
+
+      "item": {
+
+        "id": "PVTI_lADOANN5s84ACbL0zgBbxFc"
+
+      }
+
+    }
+
+  }
+
+}
+
+
+
+
+
+gh api graphql -f query='
+
+  mutation {
+
+    updateProjectV2(
+
+      input: {
+
+        projectId: "PROJECT_ID", 
+
+        title: "Project title",
+
+        public: false,
+
+        readme: "# Project README\n\nA long description",
+
+        shortDescription: "A short description"
+
+      }
+
+    ) {
+
+      projectV2 {
+
+        id
+
+        title
+
+        readme
+
+        shortDescription
+
+      }
+
+    }
+
+  }'
+
+
+
+
+
+gh api graphql -f query='
+
+  mutation {
+
+    updateProjectV2ItemFieldValue(
+
+      input: {
+
+        projectId: "PROJECT_ID"
+
+        itemId: "ITEM_ID"
+
+        fieldId: "FIELD_ID"
+
+        value: { 
+
+          text: "Updated text"        
+
+        }
+
+      }
+
+    ) {
+
+      projectV2Item {
+
+        id
+
+      }
+
+    }
+
+  }'
+
+
+
+addAssigneesToAssignable
+
+removeAssigneesFromAssignable
+
+addLabelsToLabelable
+
+removeLabelsFromLabelable
+
+updateIssue
+
+updatePullRequest
+
+transferIssue
+
+Updating a single select field
+
+The following example will update the value of a single select field for an item.
+
+PROJECT_ID - Replace this with the node ID of your project.
+
+ITEM_ID - Replace this with the node ID of the item you want to update.
+
+FIELD_ID - Replace this with the ID of the single select field that you want to update.
+
+OPTION_ID - Replace this with the ID of the desired single select option.
+
+gh api graphql -f query='
+
+  mutation {
+
+    updateProjectV2ItemFieldValue(
+
+      input: {
+
+        projectId: "PROJECT_ID"
+
+        itemId: "ITEM_ID"
+
+        fieldId: "FIELD_ID"
+
+        value: { 
+
+          singleSelectOptionId: "OPTION_ID"        
+
+        }
+
+      }
+
+    ) {
+
+      projectV2Item {
+
+        id
+
+      }
+
+    }
+
+  }'
+
+Updating an iteration field
+
+The following example will update the value of an iteration field for an item.
+
+PROJECT_ID - Replace this with the node ID of your project.
+
+ITEM_ID - Replace this with the node ID of the item you want to update.
+
+FIELD_ID - Replace this with the ID of the iteration field that you want to update.
+
+ITERATION_ID - Replace this with the ID of the desired iteration. This can be either an active or completed iteration.
+
+gh api graphql -f query='
+
+  mutation {
+
+    updateProjectV2ItemFieldValue(
+
+      input: {
+
+        projectId: "PROJECT_ID"
+
+        itemId: "ITEM_ID"
+
+        fieldId: "FIELD_ID"
+
+        value: { 
+
+          iterationId: "ITERATION_ID"        
+
+        }
+
+      }
+
+    ) {
+
+      projectV2Item {
+
+        id
+
+      }
+
+    }
+
+  }'
+
+
+
+
+
+gh api graphql -f query='
+
+  mutation {
+
+    deleteProjectV2Item(
+
+      input: {
+
+        projectId: "PROJECT_ID"
+
+        itemId: "ITEM_ID"
+
+      }
+
+    ) {
+
+      deletedItemId
+
+    }
+
+  }'
+
+
+with projects (beta)
+
+Best practices for managing projects (beta)
+
+Did this doc help you?
+
+Privacy policy
+
+Still need help?
+
+Ask the GitHub community
+
+Contact support
+
+© 2022 GitHub, Inc.
+
+Terms
+
+Privacy
+
+Security
+
+Status
+the API to manage projects (beta) - GitHub Docs
